@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from flaskapp import app, db
-from flaskapp.models import BlogPost, IpView, Day
+from flaskapp.models import BlogPost, IpView, Day, UkData
 from flaskapp.forms import PostForm
 import datetime
 
@@ -71,3 +71,56 @@ def before_request_func():
         db.session.add(ip_view)  # insert into the ip_view table
 
     db.session.commit()  # commit all the changes to the database
+
+@app.route('/dashboard_2')
+def dashboard_2():
+    uk_data = UkData.query.all()
+    uk_df = pd.DataFrame([
+    {
+        'Constituency': uk.constituency_name,
+        'Voter Turnout in 2019': uk.Turnout19,
+        'c11FulltimeStudent': uk.c11FulltimeStudent,
+        'c11Retired': uk.c11Retired,
+        'c11Female': uk.c11Female,
+        'c11HouseOwned': uk.c11HouseOwned
+    }
+    for uk in uk_data
+    ])
+
+    # Get 10 constituencies with the lowest turnout
+    lowest_turnout = uk_df.nsmallest(10, 'Voter Turnout in 2019')
+    
+    # Plot only those 10
+    fig1 = px.bar(
+        lowest_turnout,
+        x='Constituency',
+        y='Voter Turnout in 2019',
+        title='10 Constituencies with the Lowest Voter Turnout (2019)',
+        labels={'Voter Turnout in 2019': 'Turnout (%)'}
+    )
+    fig1.update_layout(xaxis_tickangle=-45)  # Rotate x-axis labels for readability
+
+    # Chart 2: Grouped bar for demographic averages
+    demographics = ['c11FulltimeStudent', 'c11Retired', 'c11Female', 'c11HouseOwned']
+    summary = lowest_turnout[demographics].mean().reset_index()
+    summary.columns = ['Demographic', 'Average %']
+
+    fig2 = px.bar(
+        summary,
+        x='Demographic',
+        y='Average %',
+        title='Average Demographics in Lowest Turnout Constituencies'
+    )
+
+    # Encode both plots
+    graphJSON1 = json.dumps(fig1, cls=plotly.utils.PlotlyJSONEncoder)
+    graphJSON2 = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return render_template(
+        'dashboard2.html',
+        title='Low Turnout Analysis',
+        graphJSON1=graphJSON1,
+        graphJSON2=graphJSON2
+    )
+
+    

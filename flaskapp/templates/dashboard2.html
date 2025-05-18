@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+
+    <p>
+        This dashboard shows the 10 UK parliamentary constituencies with the lowest voter turnout in the 2019 General Election.
+        It also highlights average demographic characteristics of these low-turnout areas, which may help identify patterns for policy or outreach.
+    </p>
+
+    <div id="graph1" style="width:100%;height:500px;"></div>
+    <script type="text/javascript">
+        let fig1 = {{ graphJSON1 | safe }};
+        Plotly.newPlot('graph1', fig1.data, fig1.layout);
+    </script>
+
+    <hr>
+
+    <h3>Demographic Characteristics</h3>
+    <p>
+        The figure below summarizes the average percentage of students, retired individuals, women, and homeowners in these constituencies.
+    </p>
+
+    <div id="graph2" style="width:100%;height:500px;"></div>
+    <script type="text/javascript">
+        let fig2 = {{ graphJSON2 | safe }};
+        Plotly.newPlot('graph2', fig2.data, fig2.layout);
+    </script>
+</body>
+</html>
+
