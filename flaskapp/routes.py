@@ -101,7 +101,7 @@ def dashboard_2():
     fig1.update_layout(xaxis_tickangle=-45)  # Rotate x-axis labels for readability
 
     # Chart 2: Grouped bar for demographic averages
-    demographics = ['c11FulltimeStudent', 'c11Retired', 'c11Female', 'c11HouseOwned']
+    demographics = ['FulltimeStudent', 'Retired', 'Women', 'HouseOwned']
     summary = lowest_turnout[demographics].mean().reset_index()
     summary.columns = ['Demographic', 'Average %']
 
